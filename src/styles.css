@@ -1,0 +1,20 @@
+.header{
+    width: 100%;
+    background-color: lightblue;
+    height: 40px;
+}
+
+.menulink{
+    padding:5px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #000;
+}
+
+.error{
+    color: red;
+}
+
+.sucess{
+    color: green;
+}

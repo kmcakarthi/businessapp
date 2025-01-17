@@ -1,0 +1,92 @@
+<div class="container">
+  <h2>Search Business</h2>
+
+  <!-- Category Section -->
+  <div class="section">
+    <h6>Category</h6>
+    <div class="grid">
+      <button
+        type="button"
+        class="category-button"
+        *ngFor="let category of categories"
+        [class.active]="selectedCategory === category"
+        (click)="selectCategory(category)"
+      >
+        {{ category?.categoryName }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Subcategory Section -->
+  <div class="section">
+    <h6>Subcategory</h6>
+    <div class="grid">
+      <button
+        type="button"
+        class="category-button"
+        *ngFor="let subcategory of subCategories"
+        (click)="selectSubcategory(subcategory)"
+      >
+        {{ subcategory?.subCategoryName }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Form -->
+  <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="search-form">
+    <input
+      type="text"
+      formControlName="searchQuery"
+      placeholder="Search..."
+      class="search-input"
+      [value]="selectedCategory + (selectedSubCategory ? ',' + selectedSubCategory : '')"
+    />
+    <button type="submit" (click)="callSearch()" class="btn-submit">Search</button>
+  </form>
+
+  <!-- Business List Table -->
+  <table *ngIf="isTableVisible" class="business-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Visiting Card</th>
+        <th>Distance (KM)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let business of businessList">
+        <td>
+          <a href="javascript:void(0)" (click)="openPopup(business)">{{ business.name }}</a>
+        </td>
+        <td>{{ business.description }}</td>
+        <td>
+          <img
+            [src]="getImageUrl(business.visitingCard)"
+            alt="Visiting card"
+            class="visiting-card"
+          />
+        </td>
+        <td>{{ business.distancekm }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <p *ngIf="isTableVisible && businessList.length === 0" class="no-records-message">
+    No records found
+  </p>
+    <!-- Popup/Modal -->
+    <div class="popup" *ngIf="selectedBusiness">
+      <div class="popup-content">
+        <span class="close" (click)="closePopup()">&times;</span>
+        <p><p><strong>Name:</strong>{{ selectedBusiness.name }}</p>
+        <p><strong>Description:</strong> {{ selectedBusiness.description }}</p>
+        <p><strong>Visiting Card:</strong> <img
+        [src]="getImageUrl(selectedBusiness.visitingCard)"
+        alt="Visiting card"
+        class="visiting-card"
+      /></p>
+        
+        <p><strong>Distance:</strong> {{ selectedBusiness.distancekm }} KM</p>
+      </div>
+    </div>
+</div>

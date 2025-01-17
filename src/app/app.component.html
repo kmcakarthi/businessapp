@@ -1,0 +1,8 @@
+<div class="header">
+  <!-- <a routerLink="" class="menulink">Home</a>
+  <a routerLink="/Registerbusiness" class="menulink">Employee</a> -->
+  <a routerLink="/login" style="float: right;" class="menulink"></a>
+  <a routerLink="/login" *ngIf="showLogout" style="float: right;" class="menulink">logout</a>
+</div>
+
+<router-outlet></router-outlet>
