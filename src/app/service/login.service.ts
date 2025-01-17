@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class LoginService {
-apiurl='http://192.168.20.2:8040/api/Auth/login';
+apiurl='https://reg-apis.onrender.com/api/Auth/login';
   constructor(private http: HttpClient) { }
 
   onSubmit(usercred:any)

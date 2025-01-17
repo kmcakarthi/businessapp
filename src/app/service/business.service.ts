@@ -6,11 +6,11 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class BusinessService {
-  private apiUrl = 'http://192.168.20.2:8040/api/Business';
-  private cus_ApiUrl = 'http://192.168.20.2:8040/api/Customer';
+  // private apiUrl = 'http://192.168.20.2:8040/api/Business';
+  // private cus_ApiUrl = 'http://192.168.20.2:8040/api/Customer';
 
-  // private apiUrl = 'https://longsagedart84.conveyor.cloud/api/Business';
-  // private cus_ApiUrl = 'https://longsagedart84.conveyor.cloud/api/Customer';
+  private apiUrl = 'https://reg-apis.onrender.com/api/Business';
+  private cus_ApiUrl = 'https://reg-apis.onrender.com/api/Customer';
 
 
   constructor(private http: HttpClient) {}
