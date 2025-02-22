@@ -7,6 +7,7 @@ import { BusinessService } from '../service/business.service';
 import { GoogleMapsModule } from '@angular/google-maps';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { AuthService } from '../service/auth.service';
 export interface Business {
   name: string;
   description: string;
@@ -27,7 +28,9 @@ export class BusinesssearchComponent implements OnInit {
   businessList: any[] = [];
   fileUpload: any;
   isTableVisible: boolean = false; // Table visibility flag
-  imageBaseUrl = 'https://localhost:7000/uploads/';
+
+  imageBaseUrl = 'http://localhost:4200/.com/';
+
   latitudeDifference: number | null = null;
   longitudeDifference: number | null = null;
 
@@ -35,8 +38,9 @@ export class BusinesssearchComponent implements OnInit {
   zoom = 10;
   marker: google.maps.LatLngLiteral | null = null;
 
-  selectedCategory!: string;
-  selectedSubCategory!: string;
+    // Variables to store selected category and subcategory objects
+  selectedCategory: any = null;
+  selectedSubCategory: any = null;
   selectedBusiness: any = null; // Initially null
   subCategories: any;
   businessDetail: any; 
@@ -44,8 +48,11 @@ export class BusinesssearchComponent implements OnInit {
   newLatitude: any;
   newLongtitude: any; 
   distance: any;
+  cusId: any;
+  customerData: any;
+  errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private businessService: BusinessService, private router: Router) { }
+  constructor(private fb: FormBuilder, private businessService: BusinessService, private router: Router, private authservice: AuthService) { }
 
   ngOnInit(): void {
     this.searchForm = this.fb.group({
@@ -60,6 +67,9 @@ export class BusinesssearchComponent implements OnInit {
     this.getCategories();
     this.getCurrentLocation();
     console.log(this.categories, "test")
+    this.cusId = this.authservice.getEmailFromToken();
+    console.log('Cusid:', this.cusId);  
+    this.getCustomerDetails();
   }
 
   getCurrentLocation(): void {
@@ -80,6 +90,22 @@ export class BusinesssearchComponent implements OnInit {
     } else {
       alert('Geolocation is not supported by your browser.');
     }
+  }
+
+  getCustomerDetails() {
+    debugger
+    this.businessService.getCustomerDetailsByID(this.cusId).subscribe({
+      next: (data) => {
+        this.customerData = data;
+        console.log("customer data", this.customerData)
+        this.errorMessage = null;
+      },
+      error: (error) => {
+        console.error('Error fetching customer details:', error);
+        this.customerData = null;
+        this.errorMessage = 'Customer not found.';
+      }
+    });
   }
 
   onMapClick(event: google.maps.MapMouseEvent) {
@@ -147,11 +173,17 @@ export class BusinesssearchComponent implements OnInit {
     return `${this.imageBaseUrl}${visitingCard?.split("\\").pop()}`;
   }
 
-  // Handle category selection
-  selectCategory(category: any): void {
-    this.selectedCategory = category?.categoryName;
-    this.getSubCategories(category?.categoryID)
-  }
+ // Handle category selection
+selectCategory(category: any): void {    
+  this.selectedCategory = category; // Store the entire category object
+  this.selectedSubCategory = null; // Reset subcategory when category changes
+  this.getSubCategories(category?.categoryID);    
+}
+
+// Handle subcategory selection
+selectSubcategory(subcategory: any): void {    
+  this.selectedSubCategory = subcategory; // Store the entire subcategory object
+}
 
   getSubCategories(id: any) {
     this.businessService.getSubCategories(id).subscribe((result: any) => {
@@ -169,7 +201,9 @@ export class BusinesssearchComponent implements OnInit {
   }
 
   callSearch() {
-    this.businessService.searchBusinesses(this.selectedCategory, this.selectedSubCategory).subscribe((result: any) => {
+    const categoryName = this.selectedCategory?.categoryName || '';
+    const subCategoryName = this.selectedSubCategory?.subCategoryName || '';
+    this.businessService.searchBusinesses(categoryName, subCategoryName).subscribe((result: any) => {
       this.businessList = result;
 
       console.log(this.businessList, "bus")
@@ -191,16 +225,12 @@ export class BusinesssearchComponent implements OnInit {
     this.businessService.getCategories().subscribe((data) => {
       this.categories = data;
       if (!this.FormVal?.CategoryID) {
-        this.searchForm.controls['CategoryID'].setValue(data[0]?.categoryID)
+        this.searchForm.controls['CategoryID'].setValue(data[0]?.categoryID)        
       }
     });
   }
 
-  // Handle subcategory selection
-  selectSubcategory(subcategory: any): void {
-    this.selectedSubCategory = subcategory?.subCategoryName
-  }
-
+  
   // Handle form submission
   onSubmit(): void {
     if (this.searchForm.valid) {

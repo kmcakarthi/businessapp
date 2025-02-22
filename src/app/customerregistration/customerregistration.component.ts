@@ -3,21 +3,24 @@ import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core'
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GoogleMapsModule } from "@angular/google-maps";
 import { BusinessService } from '../service/business.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-customerregistration',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, GoogleMapsModule],
+  imports: [ReactiveFormsModule, CommonModule, GoogleMapsModule, RouterLink],
   providers: [BusinessService],
   templateUrl: './customerregistration.component.html',
   styleUrl: './customerregistration.component.css'
 })
 export class CustomerregistrationComponent implements OnInit {
+  title = 'Register Customer'
   cusRegisterForm: FormGroup;
   fileUpload: any;
   saveresponse: any;
   messageclass = '';
   message = '';
+  emailExists: boolean = false;
   private messageService = inject(BusinessService);
 
   center: google.maps.LatLngLiteral = { lat: 37.7749, lng: -122.4194 }; // Default to San Francisco
@@ -30,8 +33,8 @@ export class CustomerregistrationComponent implements OnInit {
       Cus_EmailId: ['', [Validators.required, Validators.email]],
       Cus_Password: ['', [Validators.required, Validators.minLength(3)]],
       Cus_Location: ['', [Validators.required]],
-      Latitude: [{ value: '', disabled: true }], // New fields 
-      Longitude: [{ value: '', disabled: true }] 
+      Latitude: [8.3],
+      Longitude: [9.3],
     });
   }
 
@@ -40,7 +43,20 @@ export class CustomerregistrationComponent implements OnInit {
 
   }
   
-
+  checkEmail() {
+    debugger
+    const email = this.cusRegisterForm.get('Cus_EmailId')?.value;
+    if (email) {
+      this.businessService.checkEmailExists(email).subscribe({
+        next: (exists) => {
+          this.emailExists = exists;
+        },
+        error: () => {
+          this.emailExists = false;
+        }
+      });
+    }
+  }
    // Getter for Email Field
    get emailID() {
     return this.cusRegisterForm.get('Cus_EmailId');
@@ -125,7 +141,10 @@ export class CustomerregistrationComponent implements OnInit {
 
   submit(): void {
     
-  
+    if (this.emailExists) {
+      this.message = 'Email is already registered!';
+      return;
+    }
     // Check if the form is valid
     if (!this.cusRegisterForm.valid) {
       this.showAlert("Form is invalid. Please check the inputs.", "error");
@@ -136,8 +155,7 @@ export class CustomerregistrationComponent implements OnInit {
   
     // Call the service to register the customer
     this.businessService.registerCustomer(this.cusRegisterForm.value).subscribe({
-      next: (response) => this.onRegisterSuccess(response),
-      error: (error) => this.onRegisterError(error),
+      next: (response) => this.onRegisterSuccess(response)
     });
   }
   

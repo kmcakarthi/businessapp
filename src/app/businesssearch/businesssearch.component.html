@@ -5,28 +5,35 @@
   <div class="section">
     <h6>Category</h6>
     <div class="grid">
-      <button type="button" class="category-button" *ngFor="let category of categories"
-        [class.active]="selectedCategory === category" (click)="selectCategory(category)">
-        {{ category?.categoryName }}
-      </button>
+      <button type="button" class="category-button" 
+  *ngFor="let category of categories"
+  [class.active]="selectedCategory === category" 
+  (click)="selectCategory(category)">
+  {{ category?.categoryName }}
+</button>
+
     </div>
   </div>
 
   <!-- Subcategory Section -->
   <div class="section">
-    <h6>Subcategory</h6>
+    <h6 style="margin-top: 25px;">Subcategory</h6>
     <div class="grid">
-      <button type="button" class="category-button" *ngFor="let subcategory of subCategories"
-        (click)="selectSubcategory(subcategory)">
-        {{ subcategory?.subCategoryName }}
-      </button>
+      <button type="button" class="category-button" 
+  *ngFor="let subcategory of subCategories"
+  [class.active]="selectedSubCategory === subcategory && selectedCategory" 
+  (click)="selectSubcategory(subcategory)">
+  {{ subcategory?.subCategoryName }}
+</button>
+
     </div>
   </div>
 
   <!-- Search Form -->
   <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="search-form">
     <input type="text" formControlName="searchQuery" placeholder="Search..." class="search-input"
-      [value]="selectedCategory + (selectedSubCategory ? ',' + selectedSubCategory : '')" />
+    [value]="(selectedCategory?.categoryName || '') + (selectedSubCategory ? ', ' + selectedSubCategory?.subCategoryName : '')" readonly />
+  
     <button type="submit" (click)="callSearch()" class="btn-submit">Search</button>
   </form>
 
@@ -36,9 +43,9 @@
       <tr>
         <th>Name</th>
         <th>Description</th>
-        <th>Visiting Card</th>
-        <th>New Latitude</th>
-        <th>New Longtitude</th>
+        <!-- <th>Visiting Card</th> -->
+        <!-- <th>New Latitude</th> -->
+        <th>Address</th>
         <th>Distance (KM)</th>        
       </tr>
     </thead>
@@ -49,15 +56,15 @@
           <a href="javascript:void(0)" (click)="getBusinessDetailById(business.businessID)">{{ business.name }}</a>
         </td>
         <td>{{ business.description }}</td>
+        <!-- <td>
+          <img [src]="getImageUrl(business.visitingCard)" class="visiting-card" />
+        </td> -->
         <td>
-          <img [src]="getImageUrl(business.visitingCard)" alt="Visiting card" class="visiting-card" />
-        </td>
-        <td>
-          {{ business.latitude }} 
+          {{ business.location }} 
        </td>
-       <td>          
+       <!-- <td>          
           {{ business.longitude }} 
-       </td>
+       </td> -->
         <td>{{ business.distancekm }}</td>        
       </tr>
       <tr>
@@ -72,8 +79,8 @@
   <!-- Popup/Modal -->
   <div class="popup" *ngIf="selectedBusiness">
     <!-- Close Button -->
-    <span class="close" (click)="closePopup()">&times;</span>
     <div class="popup-content">
+      <span class="close" (click)="closePopup()">&times;</span>
       <!-- Business Details -->
       <h2 class="popup-title">Business Details</h2>
 
@@ -91,12 +98,12 @@
         </div>
 
         <!-- Visiting Card -->
-        <div class="detail-row">
+        <!-- <div class="detail-row">
           <span class="label">Visiting Card:</span>
           <span class="value">
-            <img [src]="getImageUrl(selectedBusiness.visitingCard)" alt="Visiting card" class="visiting-card" />
+            <img [src]="getImageUrl(selectedBusiness.visitingCard)" class="visiting-card" />
           </span>
-        </div>
+        </div> -->
 
         <!-- Distance -->
         <div class="detail-row">
@@ -112,26 +119,7 @@
           </google-map>
         </div>
 
-        <!-- Location Input -->
-        <div class="detail-row full-width">
-          <span class="label">Enter Location:</span>
-          <input type="text" class="form-control" id="location" [(ngModel)]="selectedBusiness.location"
-            placeholder="Enter location manually" (change)="onLocationInput()" />
-        </div>
-
-        <!-- Latitude and Longitude -->
-        <div class="detail-row">
-          <span class="label">Latitude:</span>
-          <input type="text" id="latitude" class="form-control" [(ngModel)]="selectedBusiness.latitude" readonly
-            placeholder="Latitude will appear here" />
-        </div>
-
-        <div class="detail-row">
-          <span class="label">Longitude:</span>
-          <input type="text" class="form-control" id="longitude" [(ngModel)]="selectedBusiness.longitude" readonly
-            placeholder="Longitude will appear here" />
-        </div>
-
+    
         <!-- Submit Button -->
         <div class="button-container full-width">
           <button type="submit" class="submit-btn" (click)="submitBusiness(distance)">

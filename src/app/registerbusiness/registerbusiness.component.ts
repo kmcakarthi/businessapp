@@ -4,12 +4,12 @@ import { BusinessService } from '../service/business.service';
 import { CommonModule } from '@angular/common';
 import { GoogleMapsModule } from "@angular/google-maps";
 import Swal from 'sweetalert2';
-import { Router } from '@angular/router'; 
+import { Router, RouterLink } from '@angular/router'; 
 
 @Component({
   selector: 'app-registerbusiness',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, GoogleMapsModule],
+  imports: [ReactiveFormsModule, CommonModule, GoogleMapsModule, RouterLink],
   providers: [BusinessService],
   templateUrl: './registerbusiness.component.html',
   styleUrl: './registerbusiness.component.css'
@@ -19,6 +19,8 @@ export class RegisterbusinessComponent implements OnInit {
   categories: any[] = [];
   subCategories: any[] = [];
   fileUpload: any;
+  emailExists: boolean = false;
+  message = '';
   private messageService = inject(BusinessService);
 
   center: google.maps.LatLngLiteral = { lat: 0, lng: 0 }; // Default to San Francisco
@@ -38,9 +40,10 @@ export class RegisterbusinessComponent implements OnInit {
       Latitude: [8.3],
       Longitude: [9.3],
 
-      CategoryID: [''],
-      BusinessID: [0],
-      SubCategoryID: [''],
+      CategoryID: ['', [Validators.required]],
+      BusinessID: [0, [Validators.required]],
+      SubCategoryID: ['', [Validators.required]],
+      //image: [null, Validators.required]
     });
   }
 
@@ -49,7 +52,22 @@ export class RegisterbusinessComponent implements OnInit {
     this.getCategories();
   }
   
-
+  checkEmail() {
+    debugger
+    const email = this.registerForm.get('EmailId')?.value;
+    if (email) {
+      this.businessService.checkEmailExistsBusiness(email).subscribe({
+        next: (exists) => {
+          debugger
+          this.emailExists = exists;
+        },
+        error: () => {
+          debugger
+          this.emailExists = false;
+        }
+      });
+    }
+  }
 
   // Getter for Email Field
   get emailID() {
@@ -149,6 +167,7 @@ export class RegisterbusinessComponent implements OnInit {
 
   onCategoryChange(eve: any): void {
     this.registerForm.controls['CategoryID'].setValue(eve.target.value)
+    this.registerForm.controls['SubCategoryID'].setValue('');
     this.getSubCategories();
   }
 
@@ -180,14 +199,21 @@ export class RegisterbusinessComponent implements OnInit {
 
   submit() {
     const formData = new FormData();
-  
+    if (this.emailExists) {
+      this.message = 'Email is already registered!';
+      return;
+    }
     // Append form data
     for (const key in this.registerForm.value) {
       if (this.registerForm.value.hasOwnProperty(key)) {
         formData.append(key, this.registerForm.value[key]);
       }
     }
-  
+    
+    if (this.registerForm.invalid) {
+      alert('Please select an image before submitting.');
+      return;
+    }
     // Append the file upload data
     formData.append('VisitingCard', this.fileUpload);
   

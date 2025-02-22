@@ -9,6 +9,7 @@
         type="text"
         id="username"
         formControlName="username"
+        autocomplete="off"
         placeholder="Enter your username"
         class="form-control"
       />
@@ -35,14 +36,15 @@
 
     <!-- Register Links -->
     <div class="form-links">
-      <p>Register as:</p>
+      <p>Register as</p>
       <a [routerLink]="['/Registerbusiness']" class="link">Business</a>
+      <a class="separator">|</a>
       <a [routerLink]="['/Customerregistration']" class="link">Customer</a>
     </div>
 
     <!-- Submit Button -->
     <div class="button-container">
-      <button type="submit" [disabled]="loginForm.invalid" class="btn-submit">
+      <button type="submit" [disabled]="isButtonDisabled" class="btn-submit">
         Login
       </button>
     </div>

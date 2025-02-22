@@ -18,6 +18,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   responsedata: any;
   errorMessage: string | null = null;
+  isButtonDisabled: boolean = false;
 
   constructor(private fb: FormBuilder, private service: LoginService, private router: Router) {
     localStorage.clear();
@@ -49,6 +50,7 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
+      this.isButtonDisabled = true;
       const loginData = this.loginForm.value;
       this.service.onSubmit(loginData).subscribe({
         next: (result) => {
@@ -57,17 +59,16 @@ export class LoginComponent {
             // Store the token in local storage
             localStorage.setItem('token', this.responsedata.token);
   
-            // Show success message with an alert
-            alert('Successfully logged in!');
-  
             // Navigate to the business search page
             this.router.navigateByUrl('/Businesssearch');
           } else {
             // If token is not available, show a failed login message
             alert('Login Failed!');
+            this.isButtonDisabled = false;
           }
         },
         error: (error) => {
+          this.isButtonDisabled = false;
           // Handle HTTP error responses like Unauthorized (401)
           if (error.status === 401) {
             alert('Incorrect username or password. Unauthorized!');
@@ -78,7 +79,8 @@ export class LoginComponent {
         }
       });
     } else {
-      alert('Enter valid data!');
+      alert('Enter valid username and password!');
+      this.isButtonDisabled = false;
     }
   }
 }

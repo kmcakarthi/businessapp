@@ -6,15 +6,12 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class BusinessService {
-  // private apiUrl = 'http://192.168.20.2:8040/api/Business';
-  // private cus_ApiUrl = 'http://192.168.20.2:8040/api/Customer';
 
-  // private apiUrl = 'https://localhost:7000/api/Business';
-  // private cus_ApiUrl = 'https://localhost:7000/api/Customer';
-
-  private apiUrl = 'https://reg-apis.onrender.com/api/Business';
-  private cus_ApiUrl = 'https://reg-apis.onrender.com/api/Customer';
-
+  //private apiUrl = 'https://localhost:7000/api/Business';
+  //private cus_ApiUrl = 'https://localhost:7000/api/Customer';
+  
+  private apiUrl = 'https://business-11.onrender.com/api/Business';
+  private cus_ApiUrl = 'https://business-11.onrender.com/api/Customer';
 
   constructor(private http: HttpClient) {}
 
@@ -25,6 +22,20 @@ export class BusinessService {
   updateBusiness(formData: FormData): Observable<any> {
     return this.http.put(`${this.apiUrl}`, formData);
   }
+
+  checkEmailExists(email: string): Observable<boolean> {
+    debugger
+    return this.http.get<boolean>(`${this.cus_ApiUrl}/check-email?email=${email}`);
+  }
+  checkEmailExistsBusiness(email: string): Observable<boolean> {
+    debugger
+    return this.http.get<boolean>(`${this.apiUrl}/check-email?email=${email}`);
+  }
+
+  getCustomerDetailsByID(cusId: number): Observable<any> {
+    debugger
+    return this.http.get<any>(`${this.cus_ApiUrl}/getcusdetailsbyid?cusId=${cusId}`);
+  }  
 
   registerCustomer(inputdata:any)
   {

@@ -111,3 +111,10 @@ label {
   text-align: center;
   margin-top: 15px;
 }
+
+.form-links a.separator {
+  color: #999; /* Grey color */
+  font-weight: bold;
+  pointer-events: none; /* Makes it unclickable */
+  margin: 0 20px; /* Adds spacing around it */
+}

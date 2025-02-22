@@ -1,13 +1,18 @@
 <div class="register-business-container">
   <h1>Register Business</h1>
 
-  <form [formGroup]="registerForm" (ngSubmit)="submit()" class="business-form">
-    <!-- Name -->
+  <form [formGroup]="registerForm" (ngSubmit)="submit()" class="business-form">   
+      <!-- Go to Login Link -->
+    <div class="login-link">
+      <p>Already have an account? <p><a [routerLink]="['/login']" class="link">Login Here</a></p>      
+    </div>
+     <!-- Name -->
     <div class="form-group">
       <label for="name">Business Name</label>
       <input
         id="name"
         type="text"
+        autocomplete="off"
         formControlName="Name"
         placeholder="Enter business name"
         autocomplete="off"
@@ -27,7 +32,11 @@
         formControlName="EmailId"
         placeholder="Enter email address"
         autocomplete="off"
+        (blur)="checkEmail()"
       />
+      <p *ngIf="emailExists" style="color: red;">
+        This email is already registered.
+      </p>
       <div *ngIf="emailID?.touched && emailID?.invalid" class="error">
         <small *ngIf="emailID?.hasError('required')">Email is required.</small>
         <small *ngIf="emailID?.hasError('email')">Please enter a valid email address.</small>
@@ -143,7 +152,11 @@
         <option *ngFor="let subcategory of subCategories" [value]="subcategory.subCategoryID">
           {{ subcategory.subCategoryName }}
         </option>
+       
       </select>
+      <small *ngIf="registerForm.get('SubCategoryID')?.invalid && (registerForm.get('SubCategoryID')?.dirty || registerForm.get('SubCategoryID')?.touched)" class="error">
+        SubCategory is required.
+      </small>
     </div>
 
     <!-- Visiting Card Upload -->
@@ -169,6 +182,7 @@
       [disabled]="registerForm.invalid"
     >
       Register Business
-    </button>
+    </button>   
+    <div style="text-align:center"><a  [routerLink]="['/login']" class="btn btn-link">Back</a></div>
   </form>
 </div>

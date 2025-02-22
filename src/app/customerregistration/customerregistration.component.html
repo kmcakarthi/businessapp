@@ -1,6 +1,10 @@
 <div class="customer-register-container">
   <h1>Register Customer</h1>
   <form [formGroup]="cusRegisterForm" (ngSubmit)="submit()" class="customer-form">
+    <!-- Go to Login Link -->
+    <div class="login-link">
+      <p>Already have an account? <p><a [routerLink]="['/login']" class="link">Login here</a></p>      
+    </div>
     <!-- Email Field -->
     <div class="form-group">
       <label for="email">Email</label>
@@ -10,7 +14,11 @@
         class="form-control" 
         formControlName="Cus_EmailId" 
         autocomplete="off" 
+        (blur)="checkEmail()"
         placeholder="Enter your email">
+        <p *ngIf="emailExists" style="color: red;">
+          This email is already registered.
+        </p>
       <div *ngIf="emailID?.touched && emailID?.invalid" class="error">
         <small *ngIf="emailID?.hasError('required')">Email is required.</small>
         <small *ngIf="emailID?.hasError('email')">Please enter a valid email address.</small>
@@ -83,5 +91,7 @@
 
     <!-- Submit Button -->
     <button type="submit" class="submit-btn" [disabled]="cusRegisterForm.invalid">Register Customer</button>
+    <div style="text-align:center"><a  [routerLink]="['/login']" class="btn btn-link">Back</a></div>
+
   </form>
 </div>
